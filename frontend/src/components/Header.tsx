@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Search, User, ShoppingCart } from "lucide-react";
 import { useState } from "react";
-import AuthModal from "./AuthModal";
 import { useAuthStore } from "../store/authStore";
 
 // ✅ Category Data
@@ -43,7 +42,6 @@ const brandLogos = [
 ];
 
 export default function Header() {
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   
   const menuItems = [
@@ -106,12 +104,12 @@ export default function Header() {
               </button>
             </div>
           ) : (
-            <button
-              onClick={() => setShowAuthModal(true)}
+            <Link
+              to="/auth"
               className="flex items-center gap-2 hover:text-primary"
             >
               <User size={20} /> <span className="hidden md:inline">Login</span>
-            </button>
+            </Link>
           )}
           <Link
             to="/cart"
@@ -120,9 +118,6 @@ export default function Header() {
             <ShoppingCart size={20} /> Cart
           </Link>
         </div>
-        
-        {/* Auth Modal */}
-        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
       </div>
 
       {/* ✅ Menu Row */}

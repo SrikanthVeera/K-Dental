@@ -10,15 +10,21 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle2,
+  User,
+  Phone,
   AlertTriangle
 } from 'lucide-react';
 import axios from 'axios';
 
-const AdminLogin = () => {
+const AdminRegister = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
-    password: ''
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    adminCode: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,10 +34,33 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    // Admin code validation (you can change this)
+    if (formData.adminCode !== 'ADMIN2024') {
+      setError('Invalid admin registration code. Use: ADMIN2024');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/login/admin', formData);
+      const { data } = await axios.post('http://localhost:5000/api/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        role: 'admin'
+      });
       
       localStorage.setItem('token', data.data.token);
       localStorage.setItem('user', JSON.stringify(data.data));
@@ -43,7 +72,7 @@ const AdminLogin = () => {
         navigate('/dashboard/admin');
       }, 1500);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -85,13 +114,13 @@ const AdminLogin = () => {
         transition={{ duration: 0.5 }}
         className="max-w-md w-full relative z-10"
       >
-        <Link to="/login">
+        <Link to="/">
           <motion.button
             whileHover={{ x: -5 }}
             className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            Back to selection
+            Back to home
           </motion.button>
         </Link>
 
@@ -107,7 +136,7 @@ const AdminLogin = () => {
           >
             <div className="flex items-center justify-center gap-2 text-orange-700">
               <AlertTriangle className="w-4 h-4" />
-              <span className="text-xs font-semibold">RESTRICTED ACCESS - ADMIN ONLY</span>
+              <span className="text-xs font-semibold">RESTRICTED - ADMIN REGISTRATION</span>
             </div>
           </motion.div>
 
@@ -150,7 +179,7 @@ const AdminLogin = () => {
                   <Shield className="w-12 h-12" />
                 </motion.div>
               </div>
-              <h2 className="text-3xl font-bold text-center">Admin Control Panel</h2>
+              <h2 className="text-3xl font-bold text-center">Admin Registration</h2>
               <p className="text-center text-orange-100 mt-2">Secure System Access</p>
             </motion.div>
           </div>
@@ -175,18 +204,39 @@ const AdminLogin = () => {
                 className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm flex items-center gap-2"
               >
                 <CheckCircle2 className="w-5 h-5" />
-                Authentication successful! Redirecting...
+                Registration successful! Redirecting...
               </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
               >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Admin Email
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                    placeholder="Admin Name"
+                    required
+                  />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -207,7 +257,49 @@ const AdminLogin = () => {
                 transition={{ delay: 0.4 }}
               >
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Admin Password
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                    placeholder="9876543210"
+                    required
+                  />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.45 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Admin Registration Code
+                </label>
+                <div className="relative">
+                  <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={formData.adminCode}
+                    onChange={(e) => setFormData({ ...formData, adminCode: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                    placeholder="Enter admin code"
+                    required
+                  />
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -229,14 +321,26 @@ const AdminLogin = () => {
                 </div>
               </motion.div>
 
-              <div className="flex justify-end">
-                <Link 
-                  to="/admin/forgot-password" 
-                  className="text-sm text-orange-600 hover:text-orange-700 hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.55 }}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                    placeholder="••••••••"
+                    required
+                  />
+                </div>
+              </motion.div>
 
               <motion.button
                 type="submit"
@@ -256,17 +360,17 @@ const AdminLogin = () => {
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Authenticating...
+                    Creating Account...
                   </>
                 ) : success ? (
                   <>
                     <CheckCircle2 className="w-5 h-5" />
-                    Authenticated!
+                    Success!
                   </>
                 ) : (
                   <>
                     <Shield className="w-5 h-5" />
-                    Secure Login
+                    Create Admin Account
                   </>
                 )}
               </motion.button>
@@ -278,12 +382,12 @@ const AdminLogin = () => {
               transition={{ delay: 0.6 }}
               className="mt-6 text-center text-sm text-gray-600"
             >
-              Need admin access?{' '}
+              Already have an account?{' '}
               <Link 
-                to="/register/admin" 
+                to="/login/admin" 
                 className="text-orange-600 hover:text-orange-700 font-semibold hover:underline"
               >
-                Request Admin Account
+                Login here
               </Link>
             </motion.div>
 
@@ -291,35 +395,18 @@ const AdminLogin = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200"
+              className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200"
             >
               <p className="text-xs text-orange-700 text-center">
                 <Shield className="w-4 h-4 inline mr-1" />
-                This is a secure admin area. All activities are logged and monitored.
+                Admin registration requires a valid registration code
               </p>
             </motion.div>
           </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="mt-8 grid grid-cols-3 gap-4 text-center"
-        >
-          {['Full Control', 'Analytics', 'Security'].map((feature, idx) => (
-            <motion.div
-              key={idx}
-              whileHover={{ scale: 1.05 }}
-              className="bg-white/80 backdrop-blur-sm rounded-lg p-3 shadow-md border border-orange-200"
-            >
-              <p className="text-xs font-medium text-gray-700">{feature}</p>
-            </motion.div>
-          ))}
         </motion.div>
       </motion.div>
     </div>
   );
 };
 
-export default AdminLogin;
+export default AdminRegister;
