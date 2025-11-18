@@ -15,6 +15,14 @@ import Events from "./pages/Events";
 import NewClinicSetup from "./pages/NewClinicSetup";
 import ProductsDemo from "./pages/ProductsDemo";
 
+// Auth imports
+import UnifiedAuth from "./pages/UnifiedAuth";
+
+// Dashboard imports
+import CustomerDashboard from "./pages/CustomerDashboard";
+import ServicemanDashboard from "./pages/ServicemanDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+
 // Admin imports
 import AdminLayout from "./components/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
@@ -23,7 +31,6 @@ import AddProduct from "./pages/admin/AddProduct";
 import Orders from "./pages/admin/Orders";
 import Users from "./pages/admin/Users";
 import Settings from "./pages/admin/Settings";
-import Login from "./pages/Login";
 
 export default function App() {
   return (
@@ -122,8 +129,13 @@ export default function App() {
           </>
         } />
 
-        {/* Login Route */}
-        <Route path="/login" element={<Login />} />
+        {/* Unified Auth Route */}
+        <Route path="/auth" element={<UnifiedAuth />} />
+
+        {/* Dashboard Routes */}
+        <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+        <Route path="/dashboard/serviceman" element={<ServicemanDashboard />} />
+        <Route path="/dashboard/admin" element={<AdminDashboard />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>

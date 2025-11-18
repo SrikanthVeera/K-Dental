@@ -11,18 +11,25 @@ export const register = async (req, res) => {
   try {
     const { name, email, phone, password, role } = req.body;
 
-    // Check if user exists
-    const userExists = await User.findOne({
-      where: {
-        [Op.or]: [{ email }, { phone }],
-      },
-    });
+    // Build where clause dynamically for checking existing users
+    const whereClause = [];
+    if (email) whereClause.push({ email });
+    if (phone) whereClause.push({ phone });
 
-    if (userExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists with this email or phone',
+    if (whereClause.length > 0) {
+      // Check if user exists
+      const userExists = await User.findOne({
+        where: {
+          [Op.or]: whereClause,
+        },
       });
+
+      if (userExists) {
+        return res.status(400).json({
+          success: false,
+          message: 'User already exists with this email or phone',
+        });
+      }
     }
 
     // Create user
@@ -76,17 +83,29 @@ export const login = async (req, res) => {
   try {
     const { email, phone, password, role } = req.body;
 
+    // Build where clause dynamically
+    const whereClause = [];
+    if (email) whereClause.push({ email });
+    if (phone) whereClause.push({ phone });
+
+    if (whereClause.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide email or phone number',
+      });
+    }
+
     // Find user by email or phone
     const user = await User.findOne({
       where: {
-        [Op.or]: [{ email }, { phone }],
+        [Op.or]: whereClause,
       },
     });
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email',
+        message: 'Invalid credentials',
       });
     }
 

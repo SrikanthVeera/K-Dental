@@ -255,12 +255,12 @@ const ServicemanLogin = () => {
               transition={{ delay: 0.6 }}
               className="mt-6 text-center text-sm text-gray-600"
             >
-              Want to join as serviceman?{' '}
+              Don't have an account?{' '}
               <Link 
                 to="/register/serviceman" 
                 className="text-purple-600 hover:text-purple-700 font-semibold hover:underline"
               >
-                Apply Now
+                Register as Serviceman
               </Link>
             </motion.div>
           </div>
