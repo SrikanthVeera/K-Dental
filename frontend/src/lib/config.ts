@@ -13,6 +13,6 @@ export const THEME = {
 }
 
 export const APP = {
-  name: 'K-Del',
+  name: 'K-D',
   baseUrl: '/',
 }
