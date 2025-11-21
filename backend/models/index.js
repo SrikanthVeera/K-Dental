@@ -4,6 +4,8 @@ import Review from './ReviewModel.js';
 import { Cart, CartItem } from './CartModel.js';
 import { Order, OrderItem } from './OrderModel.js';
 import PasswordResetToken from './PasswordResetTokenModel.js';
+import Brand from './BrandModel.js';
+import { sequelize } from '../config/database.js';
 
 // Define associations
 User.hasMany(Review, { foreignKey: 'userId', as: 'reviews' });
@@ -42,4 +44,6 @@ export {
   Order,
   OrderItem,
   PasswordResetToken,
+  Brand,
+  sequelize,
 };

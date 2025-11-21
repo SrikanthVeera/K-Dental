@@ -1,5 +1,5 @@
-  import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ChevronLeft, 
@@ -158,16 +158,63 @@ const TrustBadges = () => {
   );
 };
 
-// Top Brands Component - DentalKart Style
+// Top Brands Component - DentalKart Style with Carousel
 const TopBrands = () => {
-  const brands = [
-    { name: '3M ESPE', logo: "/brands/brand3.png", products: 245 },
-    { name: 'Dentsply', logo: "/brands/brand3.png", products: 189 },
-    { name: 'Woodpecker', logo: "/brands/brand3.png", products: 156 },
-    { name: 'NSK', logo: "/brands/brand3.png", products: 134 },
-    { name: 'Hu-Friedy', logo: "/brands/brand3.png", products: 198 },
-    { name: 'Sirona', logo: "/brands/brand3.png", products: 87 },
-  ];
+  const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [brands, setBrands] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const itemsPerPage = 6;
+
+  useEffect(() => {
+    fetchBrands();
+  }, []);
+
+  const fetchBrands = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/brands');
+      setBrands(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching brands:', error);
+      // Fallback to static brands
+      setBrands([
+        { name: '3M ESPE', logo: "/brands/brand3.png", products: 245 },
+        { name: 'Dentsply', logo: "/brands/brand3.png", products: 189 },
+        { name: 'Woodpecker', logo: "/brands/brand3.png", products: 156 },
+        { name: 'NSK', logo: "/brands/brand3.png", products: 134 },
+        { name: 'Hu-Friedy', logo: "/brands/brand3.png", products: 198 },
+        { name: 'Sirona', logo: "/brands/brand3.png", products: 87 },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const totalPages = Math.ceil(brands.length / itemsPerPage);
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex < totalPages - 1;
+
+  const handlePrev = () => {
+    if (canGoPrev) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (canGoNext) {
+      setCurrentIndex(prev => prev + 1);
+    }
+  };
+
+  const handleBrandClick = (brandName: string) => {
+    navigate(`/products?brand=${encodeURIComponent(brandName)}`);
+  };
+
+  const visibleBrands = brands.slice(
+    currentIndex * itemsPerPage,
+    (currentIndex + 1) * itemsPerPage
+  );
 
   return (
     <section className="py-8 bg-white">
@@ -179,20 +226,360 @@ const TopBrands = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-          {brands.map((brand, index) => (
-            <motion.div
-              key={brand.name}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all cursor-pointer"
+        <div className="relative">
+          {/* Previous Button */}
+          <button
+            onClick={handlePrev}
+            disabled={!canGoPrev}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+              canGoPrev
+                ? 'hover:bg-blue-600 hover:text-white cursor-pointer'
+                : 'opacity-50 cursor-not-allowed'
+            }`}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+
+          {/* Brands Grid */}
+          {loading ? (
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-gray-100 rounded-lg p-4 animate-pulse">
+                  <div className="w-full h-12 bg-gray-200 rounded mb-2" />
+                  <div className="w-16 h-3 bg-gray-200 rounded mx-auto" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+              {visibleBrands.map((brand, index) => (
+                <motion.div
+                  key={brand.id || brand.name}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => handleBrandClick(brand.name)}
+                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer group"
+                >
+                  <div className="w-full h-12 flex items-center justify-center mb-2">
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform"
+                    />
+                  </div>
+                  <p className="text-xs font-semibold text-gray-800 text-center mb-1">{brand.name}</p>
+                  <p className="text-xs text-gray-500 text-center">
+                    {brand.products || 0} Products
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Next Button */}
+          <button
+            onClick={handleNext}
+            disabled={!canGoNext}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center transition-all ${
+              canGoNext
+                ? 'hover:bg-blue-600 hover:text-white cursor-pointer'
+                : 'opacity-50 cursor-not-allowed'
+            }`}
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Pagination Dots */}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-2 mt-6">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentIndex
+                    ? 'bg-blue-600 w-6'
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
+// Promotional Banner Carousel Component
+const PromotionalBanner = () => {
+  const navigate = useNavigate();
+  const [currentBanner, setCurrentBanner] = useState(0);
+
+  const banners = [
+    {
+      id: 1,
+      title: 'Shop Premium',
+      subtitle: 'Dental Products',
+      description: 'Discover 20,000+ products from top brands',
+      gradient: 'from-blue-600 via-blue-700 to-cyan-600',
+      image: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=300&fit=crop',
+      icon: '🛒',
+      buttonText: 'Shop Now',
+      route: '/shop',
+      accentColor: 'blue',
+      pattern: 'dots'
+    },
+    {
+      id: 2,
+      title: 'Fast Delivery',
+      subtitle: 'At Your Doorstep',
+      description: 'Free shipping on orders above ₹5000',
+      gradient: 'from-green-600 via-emerald-600 to-teal-600',
+      image: 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?w=400&h=300&fit=crop',
+      icon: '🚚',
+      buttonText: 'Track Order',
+      route: '/dashboard/customer',
+      accentColor: 'green',
+      pattern: 'grid'
+    },
+    {
+      id: 3,
+      title: 'Expert Service',
+      subtitle: 'Professional Support',
+      description: 'Installation & maintenance by certified technicians',
+      gradient: 'from-purple-600 via-violet-600 to-indigo-600',
+      image: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=300&fit=crop',
+      icon: '🔧',
+      buttonText: 'Book Service',
+      route: '/dashboard/serviceman',
+      accentColor: 'purple',
+      pattern: 'waves'
+    },
+    {
+      id: 4,
+      title: 'New Clinic Setup',
+      subtitle: 'Complete Solutions',
+      description: 'End-to-end clinic setup with expert guidance',
+      gradient: 'from-orange-600 via-red-600 to-pink-600',
+      image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=400&h=300&fit=crop',
+      icon: '🏥',
+      buttonText: 'Get Started',
+      route: '/new-clinic-setup',
+      accentColor: 'orange',
+      pattern: 'circles'
+    }
+  ];
+
+  const totalBanners = banners.length;
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner((prev) => (prev + 1) % totalBanners);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [totalBanners]);
+
+  const handlePrev = () => {
+    setCurrentBanner((prev) => (prev - 1 + totalBanners) % totalBanners);
+  };
+
+  const handleNext = () => {
+    setCurrentBanner((prev) => (prev + 1) % totalBanners);
+  };
+
+  const getPatternStyle = (pattern: string) => {
+    switch (pattern) {
+      case 'dots':
+        return {
+          backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+          backgroundSize: '40px 40px'
+        };
+      case 'grid':
+        return {
+          backgroundImage: 'linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)',
+          backgroundSize: '50px 50px'
+        };
+      case 'waves':
+        return {
+          backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 35px, white 35px, white 37px)',
+          backgroundSize: '100px 100px'
+        };
+      case 'circles':
+        return {
+          backgroundImage: 'radial-gradient(circle at 50% 50%, white 2px, transparent 2px)',
+          backgroundSize: '60px 60px'
+        };
+      default:
+        return {};
+    }
+  };
+
+  return (
+    <section className="py-6 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="relative">
+          {/* Banner Container */}
+          <div className="overflow-hidden rounded-2xl shadow-2xl">
+            <div 
+              className="flex transition-transform duration-700 ease-in-out"
+              style={{ transform: `translateX(-${currentBanner * 100}%)` }}
             >
-              <img src={brand.logo} alt={brand.name} className="w-full h-12 object-contain mb-2" />
-              <p className="text-xs text-gray-500 text-center">{brand.products} Products</p>
-            </motion.div>
-          ))}
+              {banners.map((banner, index) => (
+                <div
+                  key={banner.id}
+                  className="w-full flex-shrink-0"
+                >
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: currentBanner === index ? 1 : 0.5 }}
+                    className={`relative bg-gradient-to-r ${banner.gradient} overflow-hidden`}
+                  >
+                    {/* Background Pattern */}
+                    <div className="absolute inset-0 opacity-10">
+                      <div className="absolute inset-0" style={getPatternStyle(banner.pattern)} />
+                    </div>
+
+                    <div className="relative flex items-center justify-between px-12 py-10">
+                      {/* Left Side - Content */}
+                      <motion.div
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                        className="flex-1 text-white z-10"
+                      >
+                        <motion.div
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="text-6xl mb-4"
+                        >
+                          {banner.icon}
+                        </motion.div>
+                        <h2 className="text-5xl font-bold mb-2">
+                          {banner.title}
+                        </h2>
+                        <p className="text-2xl text-white/90 mb-4 font-semibold">
+                          {banner.subtitle}
+                        </p>
+                        <p className="text-lg text-white/80 mb-6 max-w-md">
+                          {banner.description}
+                        </p>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => navigate(banner.route)}
+                          className="bg-white text-gray-900 px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all flex items-center gap-2 group"
+                        >
+                          {banner.buttonText}
+                          <motion.span
+                            animate={{ x: [0, 5, 0] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                          >
+                            →
+                          </motion.span>
+                        </motion.button>
+                      </motion.div>
+
+                      {/* Center - Image */}
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                        className="flex-1 flex items-center justify-center z-10"
+                      >
+                        <div className="relative">
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 3, repeat: Infinity }}
+                            className="absolute inset-0 bg-white/20 blur-3xl rounded-full"
+                          />
+                          <img
+                            src={banner.image}
+                            alt={banner.title}
+                            className="relative w-96 h-56 object-cover rounded-2xl shadow-2xl"
+                          />
+                        </div>
+                      </motion.div>
+
+                      {/* Right Side - Stats/Features */}
+                      <motion.div
+                        initial={{ x: 50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex-1 text-right text-white z-10"
+                      >
+                        <div className="space-y-4">
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 inline-block"
+                          >
+                            <div className="text-4xl font-bold">20K+</div>
+                            <div className="text-sm opacity-90">Products</div>
+                          </motion.div>
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 inline-block"
+                          >
+                            <div className="text-4xl font-bold">450+</div>
+                            <div className="text-sm opacity-90">Brands</div>
+                          </motion.div>
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="bg-white/20 backdrop-blur-sm rounded-xl p-4 inline-block"
+                          >
+                            <div className="text-4xl font-bold">100%</div>
+                            <div className="text-sm opacity-90">Genuine</div>
+                          </motion.div>
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    {/* Decorative Elements */}
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+                    />
+                    <motion.div
+                      animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
+                      transition={{ duration: 5, repeat: Infinity }}
+                      className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+                    />
+                  </motion.div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={handlePrev}
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-xl flex items-center justify-center transition-all z-20 group"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-800 group-hover:scale-125 transition-transform" />
+          </button>
+          <button
+            onClick={handleNext}
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full shadow-xl flex items-center justify-center transition-all z-20 group"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-800 group-hover:scale-125 transition-transform" />
+          </button>
+
+          {/* Pagination Dots */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+            {banners.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentBanner(index)}
+                className={`transition-all rounded-full ${
+                  index === currentBanner
+                    ? 'bg-white w-8 h-3'
+                    : 'bg-white/50 w-3 h-3 hover:bg-white/75'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -201,13 +588,15 @@ const TopBrands = () => {
 
 // Top Categories Component
 const TopCategories = () => {
+  const navigate = useNavigate();
+  
   const categories = [
-    { name: 'Equipment', icon: '🦷', count: 450, color: 'bg-blue-100 text-blue-600' },
-    { name: 'Instruments', icon: '🔧', count: 680, color: 'bg-green-100 text-green-600' },
-    { name: 'Materials', icon: '💊', count: 320, color: 'bg-purple-100 text-purple-600' },
-    { name: 'Consumables', icon: '📦', count: 890, color: 'bg-orange-100 text-orange-600' },
-    { name: 'Furniture', icon: '🪑', count: 120, color: 'bg-pink-100 text-pink-600' },
-    { name: 'Implants', icon: '⚙️', count: 210, color: 'bg-teal-100 text-teal-600' },
+    { name: 'Equipment', icon: '🦷', count: 450, color: 'bg-blue-100 text-blue-600', slug: 'equipment' },
+    { name: 'Instruments', icon: '🔧', count: 680, color: 'bg-green-100 text-green-600', slug: 'instruments' },
+    { name: 'Materials', icon: '💊', count: 320, color: 'bg-purple-100 text-purple-600', slug: 'materials' },
+    { name: 'Consumables', icon: '📦', count: 890, color: 'bg-orange-100 text-orange-600', slug: 'consumables' },
+    { name: 'Furniture', icon: '🪑', count: 120, color: 'bg-pink-100 text-pink-600', slug: 'furniture' },
+    { name: 'Implants', icon: '⚙️', count: 210, color: 'bg-teal-100 text-teal-600', slug: 'implants' },
   ];
 
   return (
@@ -232,6 +621,7 @@ const TopCategories = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.05 }}
+              onClick={() => navigate(`/category/${category.slug}`)}
               className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all cursor-pointer text-center"
             >
               <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center text-3xl mx-auto mb-4`}>
@@ -258,8 +648,22 @@ const FeaturedProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/products?limit=12&sortBy=rating');
-      setProducts(response.data.data || []);
+      const response = await axios.get('http://localhost:5000/api/products?limit=100');
+      const allProducts = response.data.data || [];
+      
+      // Filter only high-rated products (4.5 stars and above)
+      const hotSellers = allProducts.filter((p: any) => p.rating >= 4.5);
+      
+      // Sort by rating (high to low) then by price (low to high)
+      hotSellers.sort((a: any, b: any) => {
+        if (b.rating !== a.rating) {
+          return b.rating - a.rating; // Higher rating first
+        }
+        return a.price - b.price; // Lower price first if same rating
+      });
+      
+      // Take only first 12
+      setProducts(hotSellers.slice(0, 12));
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -283,7 +687,7 @@ const FeaturedProducts = () => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-gray-900">Hot Selling Products</h2>
           <Link
-            to="/shop-new"
+            to="/best-seller"
             className="text-blue-600 text-sm font-medium hover:underline"
           >
             View All →
@@ -292,14 +696,17 @@ const FeaturedProducts = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {products.slice(0, 12).map((product: any, index: number) => (
-            <motion.div
+            <Link
               key={product.id}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all overflow-hidden group cursor-pointer"
+              to="/best-seller"
             >
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+                className="bg-white border border-gray-200 rounded-lg hover:shadow-lg transition-all overflow-hidden group cursor-pointer"
+              >
               <div className="relative h-40 overflow-hidden bg-gray-50">
                 <img
                   src={product.image}
@@ -330,6 +737,7 @@ const FeaturedProducts = () => {
                 </div>
               </div>
             </motion.div>
+            </Link>
           ))}
         </div>
       </div>
@@ -625,6 +1033,7 @@ export default function HomePage() {
       
       <TopBrands />
       <TopCategories />
+      <PromotionalBanner />
       <FeaturedProducts />
       <NewClinicSetup />
       <Membership />

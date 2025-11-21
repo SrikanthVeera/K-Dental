@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Heart,
@@ -7,10 +8,11 @@ import {
   Filter,
   Search,
   RotateCcw,
-  TrendingUp,
   Package
 } from 'lucide-react';
 import axios from 'axios';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 interface Product {
   id: number;
@@ -27,7 +29,20 @@ interface Product {
   featured: boolean;
 }
 
-export default function BestSeller() {
+interface Brand {
+  id: number;
+  name: string;
+  logo: string;
+  description: string;
+  featured: boolean;
+}
+
+export default function BrandProductsPage() {
+  const [searchParams] = useSearchParams();
+  const brandName = searchParams.get('brand') || '';
+  const navigate = useNavigate();
+  
+  const [brand, setBrand] = useState<Brand | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,38 +50,41 @@ export default function BestSeller() {
   
   // Filter states
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const categories = ['Equipment', 'Instruments', 'Materials', 'Consumables', 'Furniture', 'Other'];
+
   useEffect(() => {
-    fetchBestSellers();
-  }, []);
+    if (brandName) {
+      fetchBrandAndProducts();
+    }
+  }, [brandName]);
 
   useEffect(() => {
     applyFilters();
-  }, [products, priceRange, selectedBrands, searchQuery]);
+  }, [products, priceRange, selectedCategories, selectedRatings, searchQuery]);
 
-  const fetchBestSellers = async () => {
+  const fetchBrandAndProducts = async () => {
     setLoading(true);
     try {
-      // Fetch all products
-      const response = await axios.get('http://localhost:5000/api/products?limit=200');
-      const allProducts = response.data.data || [];
-      
-      // Filter only high-rated products (4.5 stars and above)
-      const bestSellers = allProducts.filter((p: Product) => p.rating >= 4.5);
-      
-      // Sort by rating (high to low) then by price (low to high)
-      bestSellers.sort((a: Product, b: Product) => {
-        if (b.rating !== a.rating) {
-          return b.rating - a.rating; // Higher rating first
+      // Fetch products by brand
+      const productsResponse = await axios.get(`http://localhost:5000/api/products?brand=${encodeURIComponent(brandName)}`);
+      setProducts(productsResponse.data.data || []);
+
+      // Fetch brand info
+      try {
+        const brandsResponse = await axios.get('http://localhost:5000/api/brands');
+        const brandInfo = brandsResponse.data.data?.find((b: Brand) => b.name === brandName);
+        if (brandInfo) {
+          setBrand(brandInfo);
         }
-        return a.price - b.price; // Lower price first if same rating
-      });
-      
-      setProducts(bestSellers);
+      } catch (error) {
+        console.error('Error fetching brand info:', error);
+      }
     } catch (error) {
-      console.error('Error fetching best sellers:', error);
+      console.error('Error fetching products:', error);
     } finally {
       setLoading(false);
     }
@@ -78,34 +96,47 @@ export default function BestSeller() {
     // Search filter
     if (searchQuery) {
       filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQuery.toLowerCase())
+        p.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     // Price filter
     filtered = filtered.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
 
-    // Brand filter
-    if (selectedBrands.length > 0) {
-      filtered = filtered.filter(p => selectedBrands.includes(p.brand));
+    // Category filter
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(p => selectedCategories.includes(p.category));
     }
 
-    // Keep sorting by rating then price
-    filtered.sort((a, b) => {
-      if (b.rating !== a.rating) {
-        return b.rating - a.rating;
-      }
-      return a.price - b.price;
-    });
+    // Rating filter
+    if (selectedRatings.length > 0) {
+      filtered = filtered.filter(p => selectedRatings.includes(Math.floor(p.rating)));
+    }
 
     setFilteredProducts(filtered);
   };
 
   const handleResetFilters = () => {
     setPriceRange([0, 100000]);
-    setSelectedBrands([]);
+    setSelectedCategories([]);
+    setSelectedRatings([]);
     setSearchQuery('');
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const toggleRating = (rating: number) => {
+    setSelectedRatings(prev =>
+      prev.includes(rating)
+        ? prev.filter(r => r !== rating)
+        : [...prev, rating]
+    );
   };
 
   const toggleWishlist = (productId: number) => {
@@ -120,24 +151,30 @@ export default function BestSeller() {
     console.log('Added to cart:', product);
   };
 
-  const brands = Array.from(new Set(products.map(p => p.brand)));
-
   return (
     <>
-      {/* Page Header Banner */}
-      <div className="bg-gradient-to-r from-orange-600 to-red-600 text-white">
+      <Header />
+
+      {/* Brand Header Banner */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white">
         <div className="px-4 py-8">
           <div className="max-w-7xl mx-auto flex items-center gap-6">
-            <div className="w-20 h-20 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-              <TrendingUp className="w-12 h-12" />
-            </div>
+            {brand?.logo && (
+              <div className="w-32 h-32 bg-white rounded-xl p-4 flex items-center justify-center shadow-lg">
+                <img
+                  src={brand.logo}
+                  alt={brand.name}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
             <div className="flex-1">
-              <h1 className="text-4xl font-bold mb-2">Best Sellers</h1>
-              <p className="text-lg opacity-90">
-                Top-rated products loved by dental professionals
-              </p>
+              <h1 className="text-4xl font-bold mb-2">{brandName}</h1>
+              {brand?.description && (
+                <p className="text-lg opacity-90">{brand.description}</p>
+              )}
               <p className="text-sm opacity-80 mt-2">
-                {products.length} Hot Selling Products
+                {products.length} Products Available
               </p>
             </div>
           </div>
@@ -152,10 +189,10 @@ export default function BestSeller() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search best selling products..."
+                placeholder={`Search ${brandName} products...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
               />
             </div>
           </div>
@@ -176,12 +213,12 @@ export default function BestSeller() {
                 {/* Filter Header with Reset Button */}
                 <div className="p-5 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
                   <div className="flex items-center gap-2">
-                    <Filter className="w-5 h-5 text-orange-600" />
+                    <Filter className="w-5 h-5 text-blue-600" />
                     <h2 className="text-lg font-bold text-gray-900">Filters</h2>
                   </div>
                   <button
                     onClick={handleResetFilters}
-                    className="flex items-center gap-1 text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                     Reset
@@ -192,25 +229,19 @@ export default function BestSeller() {
                 <div className="flex-1 overflow-y-auto p-5 space-y-6"
                   style={{ scrollbarWidth: 'thin', scrollbarColor: '#cbd5e1 #f1f5f9' }}
                 >
-                  {/* Brand Filter */}
+                  {/* Category Filter */}
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">Brand</h3>
+                    <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">Category</h3>
                     <div className="space-y-2">
-                      {brands.map(brand => (
-                        <label key={brand} className="flex items-center gap-3 cursor-pointer hover:bg-orange-50 p-2 rounded-lg transition-colors group">
+                      {categories.map(category => (
+                        <label key={category} className="flex items-center gap-3 cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors group">
                           <input
                             type="checkbox"
-                            checked={selectedBrands.includes(brand)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedBrands([...selectedBrands, brand]);
-                              } else {
-                                setSelectedBrands(selectedBrands.filter(b => b !== brand));
-                              }
-                            }}
-                            className="w-4 h-4 text-orange-600 rounded border-gray-300 focus:ring-2 focus:ring-orange-500"
+                            checked={selectedCategories.includes(category)}
+                            onChange={() => toggleCategory(category)}
+                            className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
                           />
-                          <span className="text-sm text-gray-700 group-hover:text-gray-900">{brand}</span>
+                          <span className="text-sm text-gray-700 group-hover:text-gray-900">{category}</span>
                         </label>
                       ))}
                     </div>
@@ -227,9 +258,9 @@ export default function BestSeller() {
                         step="1000"
                         value={priceRange[1]}
                         onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-600"
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                       />
-                      <div className="flex justify-between items-center bg-orange-50 px-3 py-2 rounded-lg">
+                      <div className="flex justify-between items-center bg-blue-50 px-3 py-2 rounded-lg">
                         <span className="text-sm font-semibold text-gray-700">₹{priceRange[0]}</span>
                         <span className="text-xs text-gray-500">to</span>
                         <span className="text-sm font-semibold text-gray-700">₹{priceRange[1].toLocaleString()}</span>
@@ -237,15 +268,36 @@ export default function BestSeller() {
                     </div>
                   </div>
 
-                  {/* Info Box - Showing only 4.5+ rated products */}
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                      <h3 className="font-bold text-gray-900 text-sm">Premium Quality</h3>
+                  {/* Rating Filter (Multi-select) */}
+                  <div>
+                    <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">Rating</h3>
+                    <div className="space-y-2">
+                      {[5, 4, 3, 2, 1].map(rating => (
+                        <label key={rating} className="flex items-center gap-3 cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors group">
+                          <input
+                            type="checkbox"
+                            checked={selectedRatings.includes(rating)}
+                            onChange={() => toggleRating(rating)}
+                            className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                          />
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < rating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'fill-gray-200 text-gray-200'
+                                }`}
+                              />
+                            ))}
+                            <span className="text-sm text-gray-700 ml-2 group-hover:text-gray-900">
+                              {rating} {rating === 1 ? 'Star' : 'Stars'}
+                            </span>
+                          </div>
+                        </label>
+                      ))}
                     </div>
-                    <p className="text-xs text-gray-700">
-                      Showing only products with 4.5+ star ratings - the best of the best!
-                    </p>
                   </div>
                 </div>
               </div>
@@ -292,7 +344,7 @@ export default function BestSeller() {
                   <p className="text-gray-600 mb-6">Try adjusting your filters to see more results</p>
                   <button
                     onClick={handleResetFilters}
-                    className="px-8 py-3 bg-orange-600 text-white rounded-xl hover:bg-orange-700 transition-colors font-semibold shadow-md"
+                    className="px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold shadow-md"
                   >
                     Reset Filters
                   </button>
@@ -302,6 +354,8 @@ export default function BestSeller() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </>
   );
 }
@@ -343,15 +397,9 @@ function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, ind
           <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
         </button>
 
-        {/* Best Seller Badge */}
-        <div className="absolute top-3 left-3 bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg flex items-center gap-1">
-          <TrendingUp className="w-3 h-3" />
-          Best Seller
-        </div>
-
         {/* Discount Badge */}
         {product.discount > 0 && (
-          <div className="absolute bottom-3 left-3 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg">
+          <div className="absolute top-3 left-3 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-bold shadow-lg">
             {product.discount}% OFF
           </div>
         )}
@@ -360,7 +408,7 @@ function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, ind
       {/* Product Info */}
       <div className="p-3">
         {/* Product Title */}
-        <h3 className="text-xs font-semibold text-gray-800 mb-2 line-clamp-2 h-8 group-hover:text-orange-600 transition-colors">
+        <h3 className="text-xs font-semibold text-gray-800 mb-2 line-clamp-2 h-8 group-hover:text-blue-600 transition-colors">
           {product.name}
         </h3>
         
@@ -399,7 +447,7 @@ function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, ind
         {/* Add to Cart Button */}
         <button
           onClick={onAddToCart}
-          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-orange-600 text-white text-xs font-semibold rounded-lg hover:bg-orange-700 active:scale-95 transition-all shadow-md hover:shadow-lg"
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 active:scale-95 transition-all shadow-md hover:shadow-lg"
         >
           <ShoppingCart className="w-3.5 h-3.5" />
           Add to Cart
