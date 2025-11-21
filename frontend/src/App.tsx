@@ -5,7 +5,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProductDetail from "./pages/ProductDetail";
 import Shop from "./pages/Shop";
-import ShopPage from "./pages/ShopPage";
+import CategoryPage from "./pages/CategoryPage";
 import BuyingGuide from "./pages/BuyingGuide";
 import Freebies from "./pages/Freebies";
 import BestSeller from "./pages/BestSeller";
@@ -14,6 +14,8 @@ import MembershipDetails from "./pages/MembershipDetails";
 import Events from "./pages/Events";
 import NewClinicSetup from "./pages/NewClinicSetup";
 import ProductsDemo from "./pages/ProductsDemo";
+import BrandsPage from "./pages/BrandsPage";
+import BrandProductsPage from "./pages/BrandProductsPage";
 
 // Auth imports
 import UnifiedAuth from "./pages/UnifiedAuth";
@@ -58,13 +60,7 @@ export default function App() {
             <Footer />
           </>
         } />
-        <Route path="/shop-new" element={
-          <>
-            <Header />
-            <ShopPage />
-            <Footer />
-          </>
-        } />
+        <Route path="/category/:category" element={<CategoryPage />} />
         <Route path="/product/:slug" element={
           <>
             <Header />
@@ -128,6 +124,8 @@ export default function App() {
             <Footer />
           </>
         } />
+        <Route path="/brands" element={<BrandsPage />} />
+        <Route path="/products" element={<BrandProductsPage />} />
 
         {/* Unified Auth Route */}
         <Route path="/auth" element={<UnifiedAuth />} />

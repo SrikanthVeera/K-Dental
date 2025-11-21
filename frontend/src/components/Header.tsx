@@ -149,17 +149,18 @@ export default function Header() {
             // BRAND
             if (item === "Brand") {
               return (
-                <button
-                  key={item}
-                  onClick={() => {
-                    setOpenBrand(!openBrand);
-                    setOpenCategory(false);
-                    setShowMembership(false);
-                  }}
-                  className="hover:text-primary"
-                >
-                  Brand
-                </button>
+                <div key={item} className="relative">
+                  <button
+                    onClick={() => {
+                      setOpenBrand(!openBrand);
+                      setOpenCategory(false);
+                      setShowMembership(false);
+                    }}
+                    className="hover:text-primary"
+                  >
+                    Brand
+                  </button>
+                </div>
               );
             }
 
@@ -294,20 +295,26 @@ export default function Header() {
                       {tab}
                     </button>
                   ))}
-                  <button className="ml-auto px-5 py-2 border rounded-lg hover:bg-gray-100">
-                    View All
-                  </button>
+                  <Link 
+                    to="/brands"
+                    onClick={() => setOpenBrand(false)}
+                    className="ml-auto px-5 py-2 border rounded-lg hover:bg-gray-100 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  >
+                    View All Brands →
+                  </Link>
                 </div>
 
                 {/* Brand Logos */}
                 <div className="grid grid-cols-5 gap-6 px-2">
                   {brandLogos.map((logo, i) => (
-                    <div
+                    <Link
                       key={i}
-                      className="border rounded-lg p-4 flex justify-center items-center hover:shadow-lg cursor-pointer bg-white"
+                      to="/brands"
+                      onClick={() => setOpenBrand(false)}
+                      className="border rounded-lg p-4 flex justify-center items-center hover:shadow-lg cursor-pointer bg-white transition-all"
                     >
                       <img src={logo} className="max-h-14 object-contain" alt="brand" />
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>

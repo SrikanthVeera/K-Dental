@@ -71,6 +71,7 @@ const startServer = async () => {
     const cartRoutes = (await import("./routes/cartMySQL.js")).default;
     const ordersRoutes = (await import("./routes/ordersMySQL.js")).default;
     const adminRoutes = (await import("./routes/adminMySQL.js")).default;
+    const brandsRoutes = (await import("./routes/brands.js")).default;
 
     // Mount routes
     app.use("/api/auth", authRoutes);
@@ -79,6 +80,7 @@ const startServer = async () => {
     app.use("/api/cart", cartRoutes);
     app.use("/api/orders", ordersRoutes);
     app.use("/api/admin", adminRoutes);
+    app.use("/api/brands", brandsRoutes);
 
     // Error handling
     app.use(notFound);
