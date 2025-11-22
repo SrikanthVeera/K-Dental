@@ -57,7 +57,6 @@ export default function Header() {
 
   const [openCategory, setOpenCategory] = useState(false);
   const [openBrand, setOpenBrand] = useState(false);
-  const [showMembership, setShowMembership] = useState(false);
   const [brandTab, setBrandTab] = useState("Top Brand");
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name);
   const [selectedSub, setSelectedSub] = useState<string | null>(null);
@@ -137,7 +136,6 @@ export default function Header() {
                   onClick={() => {
                     setOpenCategory(!openCategory);
                     setOpenBrand(false);
-                    setShowMembership(false);
                   }}
                   className="hover:text-primary flex items-center gap-2"
                 >
@@ -154,7 +152,6 @@ export default function Header() {
                     onClick={() => {
                       setOpenBrand(!openBrand);
                       setOpenCategory(false);
-                      setShowMembership(false);
                     }}
                     className="hover:text-primary"
                   >
@@ -164,20 +161,20 @@ export default function Header() {
               );
             }
 
-            // ✅ MEMBERSHIP POPUP
+            // ✅ MEMBERSHIP - Navigate to new page
             if (item === "Membership") {
               return (
-                <button
+                <Link
                   key={item}
+                  to="/membership"
+                  className="hover:text-primary transition"
                   onClick={() => {
-                    setShowMembership(!showMembership);
-                    setOpenBrand(false);
                     setOpenCategory(false);
+                    setOpenBrand(false);
                   }}
-                  className="hover:text-primary"
                 >
                   {item}
-                </button>
+                </Link>
               );
             }
 
@@ -321,35 +318,7 @@ export default function Header() {
             </div>
           )}
 
-          {/* ✅ MEMBERSHIP POPUP */}
-          {showMembership && (
-            <div className="absolute left-0 top-full w-full bg-white shadow-xl border-t z-[999] py-6">
-              <div className="max-w-[1200px] mx-auto flex items-center justify-between px-10">
-                <div className="max-w-lg">
-                  <h2 className="text-xl font-bold text-primary mb-2">Membership</h2>
-                  <p className="text-gray-600 text-sm mb-3">
-                    Plus membership pays the buyer with double benefits.
-                    Delivery gets free on any purchase above ₹499 and bonus of double reward coins.
-                  </p>
-                  <p className="text-orange-600 font-semibold text-sm mb-4">
-                    See Membership Plan For More Offers And Services
-                  </p>
-                  <Link
-                    to="/membership/details"
-                    onClick={() => setShowMembership(false)}
-                    className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-primary hover:text-white transition"
-                  >
-                    Explore More
-                  </Link>
-                </div>
-                <img
-                  src="/images/membership-card.png"
-                  alt="Membership"
-                  className="w-[300px] rounded-xl shadow-md"
-                />
-              </div>
-            </div>
-          )}
+
         </div>
       </nav>
     </header>
