@@ -748,25 +748,141 @@ const FeaturedProducts = () => {
 // New Clinic Setup Component
 const NewClinicSetup = () => {
   return (
-    <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex-1 text-white"
+        {/* Section Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">New Clinic Setup</h2>
+          <Link
+            to="/new-clinic-setup"
+            className="text-blue-600 text-sm font-medium hover:underline"
           >
-            <h2 className="text-5xl font-bold mb-6">New Clinic Setup</h2>
+            View All →
+          </Link>
+        </div>
+        
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-center gap-12 p-12">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex-1 text-white"
+            >
+              <h3 className="text-4xl font-bold mb-6">
+                Start Your Dream
+                <span className="block text-yellow-300 mt-2">Dental Clinic</span>
+              </h3>
+              <p className="text-xl mb-8 opacity-90">
+                Complete dental clinic setup solutions with expert guidance and premium equipment
+              </p>
+              <ul className="space-y-4 mb-8">
+                {[
+                  'Complete Equipment Package',
+                  'Professional Installation',
+                  'Training & Support',
+                  'Warranty & Maintenance'
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-bold">✓</span>
+                    </div>
+                    <span className="text-lg">{item}</span>
+                  </motion.li>
+                ))}
+              </ul>
+              <Link
+                to="/new-clinic-setup"
+                className="inline-block bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all"
+              >
+                Get Started
+              </Link>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex-1"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&h=400&fit=crop"
+                alt="Clinic Setup"
+                className="rounded-2xl shadow-2xl"
+              />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// Membership Component
+const Membership = () => {
+  return (
+    <section className="py-16 bg-white">
+      <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">Membership Plans</h2>
+          <Link
+            to="/membership"
+            className="text-blue-600 text-sm font-medium hover:underline"
+          >
+            View All →
+          </Link>
+        </div>
+        
+        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-center gap-12 p-12">
+            {/* Left Side - Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="flex-1 text-white"
+            >
+              <h3 className="text-4xl font-bold mb-6">
+                Join 50,000+ Dentists
+                <span className="block text-yellow-300 mt-2">& Save More</span>
+              </h3>
             <p className="text-xl mb-8 opacity-90">
-              Complete dental clinic setup solutions with expert guidance and premium equipment
+              Save big with exclusive benefits, free delivery, and amazing rewards. 
+              Get instant access to premium features.
             </p>
+
+            {/* Pricing */}
+            <div className="flex items-baseline gap-4 mb-8">
+              <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl">
+                <div className="text-4xl font-bold">₹5,000</div>
+                <div className="text-sm opacity-90">/month</div>
+              </div>
+              <div className="text-2xl">or</div>
+              <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl relative">
+                <div className="absolute -top-2 -right-2 bg-yellow-400 text-purple-900 px-2 py-1 rounded-full text-xs font-bold">
+                  SAVE ₹10K
+                </div>
+                <div className="text-4xl font-bold">₹50,000</div>
+                <div className="text-sm opacity-90">/year</div>
+              </div>
+            </div>
+
+            {/* Benefits List */}
             <ul className="space-y-4 mb-8">
               {[
-                'Complete Equipment Package',
-                'Professional Installation',
-                'Training & Support',
-                'Warranty & Maintenance'
+                'Unlimited Free Delivery',
+                '1st Service Completely Free',
+                '30% Off on All Services',
+                '10% Off on All Products',
+                'Earn DentalCoins (₹1 = 1 Coin)',
+                'Priority Support & Exclusive Deals'
               ].map((item, index) => (
                 <motion.li
                   key={index}
@@ -776,124 +892,102 @@ const NewClinicSetup = () => {
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-3"
                 >
-                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold">✓</span>
+                  <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-purple-600 font-bold">✓</span>
                   </div>
                   <span className="text-lg">{item}</span>
                 </motion.li>
               ))}
             </ul>
-            <Link
-              to="/new-clinic-setup"
-              className="inline-block bg-white text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all"
-            >
-              Get Started
+
+            {/* CTA Button */}
+            <Link to="/membership">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-white text-purple-600 px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-3xl transition-all inline-flex items-center gap-3"
+              >
+                <span className="text-2xl">👑</span>
+                View Full Details
+                <ChevronRight className="w-6 h-6" />
+              </motion.button>
             </Link>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 mt-12">
+              {[
+                { value: '50K+', label: 'Members' },
+                { value: '₹10K', label: 'Avg Savings' },
+                { value: '4.9★', label: 'Rating' }
+              ].map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 + index * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-3xl font-bold mb-1">{stat.value}</div>
+                  <div className="text-sm opacity-80">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
+
+          {/* Right Side - Image */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             className="flex-1"
           >
-            <img
-              src="https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&h=400&fit=crop"
-              alt="Clinic Setup"
-              className="rounded-2xl shadow-2xl"
-            />
+            <div className="relative">
+              <img
+                src="/images/membership-card.png"
+                alt="Membership"
+                className="rounded-2xl shadow-2xl"
+                onError={(e) => {
+                  // Fallback to placeholder
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&h=400&fit=crop";
+                }}
+              />
+              
+              {/* Floating Benefits Cards */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.5 }}
+                className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-2xl"
+              >
+                <div className="flex items-center gap-3">
+                  <Package className="w-8 h-8 text-blue-600" />
+                  <div>
+                    <div className="font-bold text-gray-900">Free Delivery</div>
+                    <div className="text-sm text-gray-600">On all orders</div>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.6 }}
+                className="absolute -top-6 -right-6 bg-white rounded-2xl p-4 shadow-2xl"
+              >
+                <div className="flex items-center gap-3">
+                  <BadgeCheck className="w-8 h-8 text-green-600" />
+                  <div>
+                    <div className="font-bold text-gray-900">10% Off</div>
+                    <div className="text-sm text-gray-600">All products</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Membership Component
-const Membership = () => {
-  const plans = [
-    {
-      name: 'Silver',
-      price: '₹999',
-      period: '/year',
-      features: ['5% Discount', 'Free Shipping', 'Priority Support', '500 DentalCoins'],
-      color: 'from-gray-400 to-gray-600'
-    },
-    {
-      name: 'Gold',
-      price: '₹1,999',
-      period: '/year',
-      features: ['10% Discount', 'Free Shipping', '24/7 Support', '1000 DentalCoins', 'Exclusive Deals'],
-      color: 'from-yellow-400 to-yellow-600',
-      popular: true
-    },
-    {
-      name: 'Platinum',
-      price: '₹4,999',
-      period: '/year',
-      features: ['15% Discount', 'Free Shipping', 'Dedicated Manager', '2500 DentalCoins', 'Early Access', 'Free Training'],
-      color: 'from-purple-400 to-purple-600'
-    }
-  ];
-
-  return (
-    <section className="py-16">
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Membership Plans</h2>
-          <p className="text-gray-600">Join 2 Lakh+ dentists and save more</p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className={`relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden ${
-                plan.popular ? 'ring-4 ring-[#007AFF] scale-105' : ''
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute top-0 right-0 bg-[#007AFF] text-white px-4 py-1 text-sm font-semibold">
-                  POPULAR
-                </div>
-              )}
-              <div className={`h-32 bg-gradient-to-r ${plan.color} flex items-center justify-center`}>
-                <h3 className="text-3xl font-bold text-white">{plan.name}</h3>
-              </div>
-              <div className="p-8">
-                <div className="text-center mb-6">
-                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                  <span className="text-gray-600">{plan.period}</span>
-                </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <Award className="h-5 w-5 text-green-500" />
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/membership"
-                  className={`block text-center py-3 rounded-lg font-semibold transition-all ${
-                    plan.popular
-                      ? 'bg-[#007AFF] text-white hover:bg-[#0056b3]'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
-                  }`}
-                >
-                  Choose Plan
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+          </div>
         </div>
       </div>
     </section>
@@ -927,25 +1021,17 @@ const Events = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex justify-between items-center mb-12"
-        >
-          <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-2">Upcoming Events</h2>
-            <p className="text-gray-600">Join our educational events and workshops</p>
-          </div>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-900">Upcoming Events</h2>
           <Link
             to="/events"
-            className="text-[#007AFF] font-semibold flex items-center gap-2 hover:gap-3 transition-all"
+            className="text-blue-600 text-sm font-medium hover:underline"
           >
-            View All Events <ChevronRight className="h-5 w-5" />
+            View All →
           </Link>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {events.map((event, index) => (
@@ -986,41 +1072,7 @@ const Events = () => {
   );
 };
 
-// Stats Component
-const Stats = () => {
-  const stats = [
-    { icon: Users, value: '2L+', label: 'Happy Dentists' },
-    { icon: Package, value: '20K+', label: 'Products' },
-    { icon: TrendingUp, value: '99%', label: 'Satisfaction' },
-    { icon: Award, value: '15+', label: 'Years Experience' }
-  ];
 
-  return (
-    <section className="py-16 bg-[#007AFF]">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.5 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center text-white"
-              >
-                <Icon className="h-12 w-12 mx-auto mb-4" />
-                <div className="text-4xl font-bold mb-2">{stat.value}</div>
-                <div className="text-lg opacity-90">{stat.label}</div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-};
 
 // Main HomePage Component
 export default function HomePage() {
@@ -1038,7 +1090,6 @@ export default function HomePage() {
       <NewClinicSetup />
       <Membership />
       <Events />
-      <Stats />
     </div>
   );
 }
