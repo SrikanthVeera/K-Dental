@@ -14,7 +14,7 @@ import {
   Star
 } from 'lucide-react';
 import axios from 'axios';
-import Users from './admin/Users';
+import { AdminButtonBar, AdminBadge } from '../components/AdminControls';
 
 // Hero Banner Component - DentalKart Style
 const HeroBanner = () => {
@@ -694,6 +694,13 @@ const FeaturedProducts = () => {
           </Link>
         </div>
 
+        {/* Admin Controls for Hot Selling Section */}
+        <AdminButtonBar 
+          label="Hot Selling Products"
+          onEdit={() => console.log('Edit hot selling products')}
+          onAdd={() => console.log('Add product to hot selling')}
+        />
+
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {products.slice(0, 12).map((product: any, index: number) => (
             <Link
@@ -1090,6 +1097,9 @@ export default function HomePage() {
       <NewClinicSetup />
       <Membership />
       <Events />
+      
+      {/* Admin Badge - Shows admin is logged in */}
+      <AdminBadge />
     </div>
   );
 }
