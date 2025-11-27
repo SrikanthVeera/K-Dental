@@ -1,7 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, User, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useAuthStore } from "../store/authStore";
+import { useCartStore } from "../store/cartStore";
+import CartSidebar from "./CartSidebar";
+import LogoutModal from "./LogoutModal";
 
 // ✅ Category Data
 const categories = [
@@ -42,7 +45,9 @@ const brandLogos = [
 ];
 
 export default function Header() {
+  const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { getTotalItems, toggleCart } = useCartStore();
   
   const menuItems = [
     "Category",
@@ -60,6 +65,7 @@ export default function Header() {
   const [brandTab, setBrandTab] = useState("Top Brand");
   const [selectedCategory, setSelectedCategory] = useState(categories[0].name);
   const [selectedSub, setSelectedSub] = useState<string | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const subList = categories.find((c) => c.name === selectedCategory)?.subs || [];
   const itemList = items[selectedSub as any] || [];
@@ -89,33 +95,47 @@ export default function Header() {
         <div className="flex items-center gap-6 text-sm font-medium text-gray-700">
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </div>
-                <span className="hidden md:inline">{user?.name}</span>
-              </div>
+              <Link to="/dashboard" className="flex items-center gap-2 hover:bg-gray-50 p-2 rounded-lg transition-colors">
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-8 h-8 rounded-full border-2 border-blue-200"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                    {user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="hidden md:inline font-medium">{user?.name}</span>
+              </Link>
               <button
-                onClick={logout}
-                className="text-sm hover:text-red-600"
+                onClick={() => setShowLogoutModal(true)}
+                className="text-sm hover:text-red-600 px-3 py-1 rounded-lg hover:bg-red-50 transition-colors"
               >
                 Logout
               </button>
             </div>
           ) : (
             <Link
-              to="/auth"
-              className="flex items-center gap-2 hover:text-primary"
+              to="/login"
+              className="flex items-center gap-2 hover:text-primary px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors"
             >
               <User size={20} /> <span className="hidden md:inline">Login</span>
             </Link>
           )}
-          <Link
-            to="/cart"
-            className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-lg hover:bg-primaryDark"
+          <button
+            onClick={toggleCart}
+            className="relative flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-lg hover:bg-primaryDark transition-colors"
           >
-            <ShoppingCart size={20} /> Cart
-          </Link>
+            <ShoppingCart size={20} />
+            <span className="hidden md:inline">Cart</span>
+            {getTotalItems() > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center animate-pulse">
+                {getTotalItems()}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
@@ -321,6 +341,21 @@ export default function Header() {
 
         </div>
       </nav>
+      
+      {/* Cart Sidebar */}
+      <CartSidebar />
+      
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          logout();
+          setShowLogoutModal(false);
+          navigate('/');
+        }}
+        userName={user?.name}
+      />
     </header>
   );
 }

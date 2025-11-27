@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Home from "./pages/home";
 import HomePage from "./pages/HomePage";
 import Header from "./components/Header";
@@ -16,6 +17,17 @@ import NewClinicSetup from "./pages/NewClinicSetup";
 import ProductsDemo from "./pages/ProductsDemo";
 import BrandsPage from "./pages/BrandsPage";
 import BrandProductsPage from "./pages/BrandProductsPage";
+
+// Cart imports
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
+import CartDemoPage from "./pages/CartDemoPage";
+import ApiTestPage from "./pages/ApiTestPage";
+
+// New Auth imports
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
 
 // Auth imports
 import UnifiedAuth from "./pages/UnifiedAuth";
@@ -37,6 +49,30 @@ import Settings from "./pages/admin/Settings";
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: '#363636',
+            color: '#fff',
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: '#4ade80',
+              secondary: '#fff',
+            },
+          },
+          error: {
+            duration: 4000,
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#fff',
+            },
+          },
+        }}
+      />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={
@@ -127,8 +163,17 @@ export default function App() {
         <Route path="/brands" element={<BrandsPage />} />
         <Route path="/products" element={<BrandProductsPage />} />
 
-        {/* Unified Auth Route */}
+        {/* Cart Routes */}
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-success" element={<OrderSuccessPage />} />
+        <Route path="/cart-demo" element={<CartDemoPage />} />
+        <Route path="/api-test" element={<ApiTestPage />} />
+
+        {/* Auth Routes */}
         <Route path="/auth" element={<UnifiedAuth />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
 
         {/* Dashboard Routes */}
         <Route path="/dashboard/customer" element={<CustomerDashboard />} />

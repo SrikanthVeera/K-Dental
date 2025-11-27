@@ -1,117 +1,67 @@
-import { useState } from 'react';
-import { ShoppingCart, Star, Heart } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ShoppingCart, Star, Heart, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAddToCart } from '../hooks/useAddToCart';
 
 interface Product {
   id: number;
   name: string;
   brand: string;
   price: number;
-  originalPrice?: number;
-  rating: number;
-  reviews: number;
+  mrp: number;
+  rating?: number;
+  numReviews?: number;
   image: string;
   discount?: number;
   inStock: boolean;
+  category: string;
+  description?: string;
 }
 
-const dummyProducts: Product[] = [
-  {
-    id: 1,
-    name: "Dental Ultrasonic Scaler",
-    brand: "Woodpecker",
-    price: 12999,
-    originalPrice: 15999,
-    rating: 4.5,
-    reviews: 128,
-    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=400&fit=crop",
-    discount: 19,
-    inStock: true
-  },
-  {
-    id: 2,
-    name: "LED Curing Light",
-    brand: "3M ESPE",
-    price: 8499,
-    originalPrice: 10999,
-    rating: 4.8,
-    reviews: 256,
-    image: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=400&h=400&fit=crop",
-    discount: 23,
-    inStock: true
-  },
-  {
-    id: 3,
-    name: "Dental Composite Kit",
-    brand: "Dentsply",
-    price: 3299,
-    rating: 4.6,
-    reviews: 89,
-    image: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=400&h=400&fit=crop",
-    inStock: true
-  },
-  {
-    id: 4,
-    name: "Surgical Extraction Kit",
-    brand: "Hu-Friedy",
-    price: 5999,
-    originalPrice: 7499,
-    rating: 4.7,
-    reviews: 145,
-    image: "https://images.unsplash.com/photo-1598531228433-d9f0b5f9c4e0?w=400&h=400&fit=crop",
-    discount: 20,
-    inStock: true
-  },
-  {
-    id: 5,
-    name: "Dental Loupes 3.5x",
-    brand: "Orascoptic",
-    price: 24999,
-    originalPrice: 29999,
-    rating: 4.9,
-    reviews: 312,
-    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&h=400&fit=crop",
-    discount: 17,
-    inStock: true
-  },
-  {
-    id: 6,
-    name: "Autoclave Sterilizer",
-    brand: "Tuttnauer",
-    price: 45999,
-    rating: 4.4,
-    reviews: 67,
-    image: "https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?w=400&h=400&fit=crop",
-    inStock: false
-  },
-  {
-    id: 7,
-    name: "Dental Chair Unit",
-    brand: "Sirona",
-    price: 189999,
-    originalPrice: 219999,
-    rating: 4.8,
-    reviews: 45,
-    image: "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=400&h=400&fit=crop",
-    discount: 14,
-    inStock: true
-  },
-  {
-    id: 8,
-    name: "Apex Locator",
-    brand: "Dentsply",
-    price: 15999,
-    originalPrice: 18999,
-    rating: 4.6,
-    reviews: 178,
-    image: "https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=400&h=400&fit=crop",
-    discount: 16,
-    inStock: true
-  }
-];
-
 export default function ProductGrid() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [wishlist, setWishlist] = useState<number[]>([]);
+  const { addToCart } = useAddToCart();
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/products');
+      const data = await response.json();
+      
+      if (data.success) {
+        // Transform backend data to match frontend interface
+        const transformedProducts = data.data.map((product: any) => ({
+          id: product.id,
+          name: product.name,
+          brand: product.brand,
+          price: product.price,
+          mrp: product.mrp || product.price,
+          rating: product.rating || 4.5,
+          numReviews: product.numReviews || 0,
+          image: product.image || 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=400&fit=crop',
+          discount: product.discount || Math.round(((product.mrp - product.price) / product.mrp) * 100),
+          inStock: product.inStock,
+          category: product.category,
+          description: product.description
+        }));
+        setProducts(transformedProducts);
+      } else {
+        setError('Failed to fetch products');
+      }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleWishlist = (productId: number) => {
     setWishlist(prev => 
@@ -121,10 +71,76 @@ export default function ProductGrid() {
     );
   };
 
-  const addToCart = (product: Product) => {
-    console.log('Added to cart:', product);
-    // Add your cart logic here
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      mrp: product.mrp,
+      image: product.image,
+      brand: product.brand,
+      category: product.category,
+      inStock: product.inStock
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F9FF] to-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Products...</h2>
+              <p className="text-gray-600">Fetching the latest dental products for you</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F9FF] to-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">⚠️</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Unable to Load Products</h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <button
+                onClick={fetchProducts}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#F4F9FF] to-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShoppingCart className="w-8 h-8 text-gray-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">No Products Found</h2>
+              <p className="text-gray-600">We're working on adding more products to our catalog</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F4F9FF] to-white py-12 px-4 sm:px-6 lg:px-8">
@@ -135,13 +151,13 @@ export default function ProductGrid() {
             Premium Dental Products
           </h1>
           <p className="text-gray-600">
-            Discover high-quality dental equipment and supplies
+            Discover high-quality dental equipment and supplies ({products.length} products available)
           </p>
         </div>
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {dummyProducts.map((product, index) => (
+          {products.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 20 }}
@@ -150,7 +166,7 @@ export default function ProductGrid() {
               className="group relative bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden"
             >
               {/* Discount Badge */}
-              {product.discount && (
+              {product.discount && product.discount > 0 && (
                 <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                   {product.discount}% OFF
                 </div>
@@ -176,6 +192,10 @@ export default function ProductGrid() {
                   src={product.image}
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=400&h=400&fit=crop';
+                  }}
                 />
                 {!product.inStock && (
                   <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -201,11 +221,11 @@ export default function ProductGrid() {
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="text-sm font-medium text-gray-900">
-                      {product.rating}
+                      {product.rating?.toFixed(1) || '4.5'}
                     </span>
                   </div>
                   <span className="text-sm text-gray-500">
-                    ({product.reviews} reviews)
+                    ({product.numReviews || 0} reviews)
                   </span>
                 </div>
 
@@ -214,9 +234,9 @@ export default function ProductGrid() {
                   <span className="text-2xl font-bold text-gray-900">
                     ₹{product.price.toLocaleString('en-IN')}
                   </span>
-                  {product.originalPrice && (
+                  {product.mrp !== product.price && (
                     <span className="text-sm text-gray-500 line-through">
-                      ₹{product.originalPrice.toLocaleString('en-IN')}
+                      ₹{product.mrp.toLocaleString('en-IN')}
                     </span>
                   )}
                 </div>
@@ -225,7 +245,7 @@ export default function ProductGrid() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => addToCart(product)}
+                  onClick={() => handleAddToCart(product)}
                   disabled={!product.inStock}
                   className={`w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
                     product.inStock
@@ -242,6 +262,17 @@ export default function ProductGrid() {
               <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#007AFF] rounded-2xl transition-colors duration-300 pointer-events-none" />
             </motion.div>
           ))}
+        </div>
+
+        {/* Refresh Button */}
+        <div className="text-center mt-12">
+          <button
+            onClick={fetchProducts}
+            className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto"
+          >
+            <Loader className="w-5 h-5" />
+            Refresh Products
+          </button>
         </div>
       </div>
     </div>

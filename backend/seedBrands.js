@@ -12,7 +12,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const brandsData = [
   {
     name: '3M ESPE',
-    logo: 'https://via.placeholder.com/200x100/0066CC/FFFFFF?text=3M+ESPE',
+    logo: 'https://ui-avatars.com/api/?name=3M+ESPE&background=0066CC&color=FFFFFF&size=200x100&format=png',
     description: 'Leading dental materials manufacturer with innovative solutions',
     featured: true
   },
