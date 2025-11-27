@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize';
 // Create sequelize instance
 // Note: This will use environment variables that should be loaded before this module is imported
 export const sequelize = new Sequelize(
-  process.env.DB_NAME || 'dentalshop',
+  process.env.DB_NAME || 'dental',
   process.env.DB_USER || 'root',
   process.env.DB_PASSWORD || '',
   {
