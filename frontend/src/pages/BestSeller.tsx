@@ -11,6 +11,7 @@ import {
   Package
 } from 'lucide-react';
 import axios from 'axios';
+import { useAddToCart } from '../hooks/useAddToCart';
 
 interface Product {
   id: number;
@@ -116,8 +117,19 @@ export default function BestSeller() {
     );
   };
 
+  const { addToCart: addToCartHook } = useAddToCart();
+
   const addToCart = (product: Product) => {
-    console.log('Added to cart:', product);
+    addToCartHook({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      mrp: product.mrp,
+      image: product.image,
+      brand: product.brand,
+      category: product.category,
+      inStock: product.inStock
+    }, true); // Redirect to cart page
   };
 
   const brands = Array.from(new Set(products.map(p => p.brand)));
