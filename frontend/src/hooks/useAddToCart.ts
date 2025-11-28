@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../store/cartStore';
 import { toast } from 'react-hot-toast';
 
@@ -13,9 +14,10 @@ interface Product {
 }
 
 export const useAddToCart = () => {
+  const navigate = useNavigate();
   const { addItem, getItemById } = useCartStore();
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, redirectToCart: boolean = false) => {
     if (!product.inStock) {
       toast.error('Product is out of stock');
       return;
@@ -36,9 +38,20 @@ export const useAddToCart = () => {
     });
 
     if (existingItem) {
-      toast.success(`Increased quantity to ${existingItem.quantity + 1}`);
+      toast.success(`Increased quantity to ${existingItem.quantity + 1}`, {
+        duration: 2000,
+      });
     } else {
-      toast.success(`${product.name} added to cart!`);
+      toast.success(`${product.name} added to cart!`, {
+        duration: 2000,
+      });
+    }
+
+    // Navigate to cart if requested
+    if (redirectToCart) {
+      setTimeout(() => {
+        navigate('/cart');
+      }, 500);
     }
   };
 

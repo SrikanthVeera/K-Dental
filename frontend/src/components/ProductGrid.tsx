@@ -81,7 +81,7 @@ export default function ProductGrid() {
       brand: product.brand,
       category: product.category,
       inStock: product.inStock
-    });
+    }, true); // Redirect to cart page after adding
   };
 
   if (loading) {

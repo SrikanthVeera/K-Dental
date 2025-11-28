@@ -117,7 +117,7 @@ export default function CartDemoPage() {
       brand: product.brand,
       category: product.category,
       inStock: product.inStock
-    });
+    }, true); // Redirect to cart page after adding
   };
 
   return (
