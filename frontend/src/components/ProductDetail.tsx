@@ -2,14 +2,18 @@ import { useParams } from "react-router-dom";
 import { getProductBySlug } from "../mock/data";
 import ProductGallery from "../components/ProductGallery";
 import RatingStars from "../components/RatingStars";
-import { useCart } from "../store/cart";
+import { useCartStore } from "../store/cartStore";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ProductDetail() {
   const { slug } = useParams();
   const product = getProductBySlug(slug || "");
-  const add = useCart(s => s.add);
+  const { addItem, getItemById } = useCartStore();
   const [variant, setVariant] = useState<string | undefined>(product?.variants?.[0]?.value);
+  const [isAdding, setIsAdding] = useState(false);
+  
+  const cartItem = product ? getItemById(product.id) : undefined;
 
   if (!product) {
     return (
@@ -67,12 +71,79 @@ export default function ProductDetail() {
         {/* Actions */}
         <div className="mt-6 flex gap-3">
           <button
-            className="bg-primary hover:bg-primaryDark text-white px-5 py-3 rounded-lg"
-            onClick={() => add(product, 1, variant)}
+            type="button"
+            className={`px-5 py-3 rounded-lg transition-all ${
+              isAdding 
+                ? 'bg-green-500 text-white' 
+                : 'bg-primary hover:bg-primaryDark text-white'
+            }`}
+            onClick={(e) => {
+              e.preventDefault();
+              
+              // Validate product ID
+              if (!product.id || product.id === null || product.id === undefined) {
+                console.error('❌ Cannot add to cart: Product ID is missing', product);
+                toast.error('Cannot add product: Invalid product data');
+                return;
+              }
+
+              // Validate required fields
+              if (!product.name || !product.price) {
+                console.error('❌ Cannot add to cart: Missing required fields', product);
+                toast.error('Cannot add product: Incomplete data');
+                return;
+              }
+
+              console.log('✅ Adding product to cart:', {
+                id: product.id,
+                name: product.name,
+                price: product.price
+              });
+              
+              setIsAdding(true);
+              
+              try {
+                addItem({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  mrp: product.mrp,
+                  image: product.images?.[0] || product.image,
+                  brand: product.brand,
+                  category: product.category || "General",
+                  inStock: true,
+                  maxQuantity: 10
+                });
+                
+                // Verify item was added
+                const addedItem = getItemById(product.id);
+                if (addedItem) {
+                  console.log('✅ Product successfully added. Quantity:', addedItem.quantity);
+                  toast.success(`${product.name} added to cart!`, {
+                    duration: 2000,
+                    position: 'top-center',
+                  });
+                } else {
+                  console.error('❌ Product was not added to cart');
+                  toast.error('Failed to add product');
+                }
+              } catch (error) {
+                console.error('❌ Error adding to cart:', error);
+                toast.error('An error occurred');
+              } finally {
+                setTimeout(() => setIsAdding(false), 1000);
+              }
+            }}
+            disabled={isAdding}
           >
-            Add to Cart
+            {isAdding ? '✓ Added!' : cartItem ? `In Cart (${cartItem.quantity})` : 'Add to Cart'}
           </button>
-          <button className="px-5 py-3 rounded-lg border">Buy Now</button>
+          <button 
+            type="button"
+            className="px-5 py-3 rounded-lg border hover:bg-gray-50 transition-colors"
+          >
+            Buy Now
+          </button>
         </div>
 
         {/* Description */}

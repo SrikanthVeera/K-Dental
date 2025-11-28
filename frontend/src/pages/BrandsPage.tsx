@@ -40,20 +40,20 @@ export default function BrandsPage() {
       setBrands(response.data.data || []);
     } catch (error) {
       console.error('Error fetching brands:', error);
-      // Mock data for demo
+      // Mock data for demo with local logo paths
       const mockBrands: Brand[] = [
-        { id: 1, name: '3M ESPE', logo: 'https://via.placeholder.com/150', productCount: 245, description: 'Leading dental materials manufacturer', featured: true },
-        { id: 2, name: 'Dentsply Sirona', logo: 'https://via.placeholder.com/150', productCount: 312, description: 'Complete dental solutions', featured: true },
-        { id: 3, name: 'Ivoclar Vivadent', logo: 'https://via.placeholder.com/150', productCount: 189, description: 'Innovative dental products', featured: true },
-        { id: 4, name: 'Kerr Dental', logo: 'https://via.placeholder.com/150', productCount: 156, description: 'Quality dental supplies', featured: false },
-        { id: 5, name: 'GC Corporation', logo: 'https://via.placeholder.com/150', productCount: 198, description: 'Japanese dental excellence', featured: false },
-        { id: 6, name: 'Ultradent', logo: 'https://via.placeholder.com/150', productCount: 134, description: 'Advanced dental materials', featured: false },
-        { id: 7, name: 'Shofu Dental', logo: 'https://via.placeholder.com/150', productCount: 167, description: 'Premium dental products', featured: false },
-        { id: 8, name: 'Septodont', logo: 'https://via.placeholder.com/150', productCount: 89, description: 'Anesthesia specialists', featured: false },
-        { id: 9, name: 'Bisco Dental', logo: 'https://via.placeholder.com/150', productCount: 112, description: 'Bonding & restorative', featured: false },
-        { id: 10, name: 'Coltene', logo: 'https://via.placeholder.com/150', productCount: 145, description: 'Swiss dental quality', featured: false },
-        { id: 11, name: 'Angelus', logo: 'https://via.placeholder.com/150', productCount: 78, description: 'Endodontic solutions', featured: false },
-        { id: 12, name: 'Miltex', logo: 'https://via.placeholder.com/150', productCount: 203, description: 'Surgical instruments', featured: false },
+        { id: 1, name: '3M ESPE', logo: '/logos/3m.png', productCount: 245, description: 'Leading dental materials manufacturer', featured: true },
+        { id: 2, name: 'Dentsply Sirona', logo: '/logos/dentsply.png', productCount: 312, description: 'Complete dental solutions', featured: true },
+        { id: 3, name: 'Ivoclar Vivadent', logo: '/logos/ivoclar.png', productCount: 189, description: 'Innovative dental products', featured: true },
+        { id: 4, name: 'Kerr Dental', logo: '/logos/kerr.png', productCount: 156, description: 'Quality dental supplies', featured: false },
+        { id: 5, name: 'GC Corporation', logo: '/logos/gc.png', productCount: 198, description: 'Japanese dental excellence', featured: false },
+        { id: 6, name: 'Ultradent', logo: '/logos/ultradent.png', productCount: 134, description: 'Advanced dental materials', featured: false },
+        { id: 7, name: 'Shofu Dental', logo: '/logos/shofu.png', productCount: 167, description: 'Premium dental products', featured: false },
+        { id: 8, name: 'Septodont', logo: '/logos/septodont.png', productCount: 89, description: 'Anesthesia specialists', featured: false },
+        { id: 9, name: 'Bisco Dental', logo: '/logos/bisco.png', productCount: 112, description: 'Bonding & restorative', featured: false },
+        { id: 10, name: 'Coltene', logo: '/logos/coltene.png', productCount: 145, description: 'Swiss dental quality', featured: false },
+        { id: 11, name: 'Angelus', logo: '/logos/angelus.png', productCount: 78, description: 'Endodontic solutions', featured: false },
+        { id: 12, name: 'Miltex', logo: '/logos/miltex.png', productCount: 203, description: 'Surgical instruments', featured: false },
       ];
       setBrands(mockBrands);
     } finally {

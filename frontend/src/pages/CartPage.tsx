@@ -34,6 +34,11 @@ export default function CartPage() {
     getTotalSavings
   } = useCartStore();
 
+  // Debug: Log cart items
+  console.log('🛒 CartPage - Items from store:', items);
+  console.log('🛒 CartPage - Total items:', getTotalItems());
+  console.log('🛒 CartPage - localStorage:', localStorage.getItem('dental-cart-storage'));
+
   const [promoCode, setPromoCode] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
   const [showPromoSuccess, setShowPromoSuccess] = useState(false);

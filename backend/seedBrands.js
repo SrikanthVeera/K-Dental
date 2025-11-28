@@ -12,121 +12,121 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 const brandsData = [
   {
     name: '3M ESPE',
-    logo: 'https://ui-avatars.com/api/?name=3M+ESPE&background=0066CC&color=FFFFFF&size=200x100&format=png',
+    logo: '/logos/3m.png',
     description: 'Leading dental materials manufacturer with innovative solutions',
     featured: true
   },
   {
     name: 'Dentsply Sirona',
-    logo: 'https://via.placeholder.com/200x100/E31837/FFFFFF?text=Dentsply',
+    logo: '/logos/dentsply.png',
     description: 'Complete dental solutions and equipment provider',
     featured: true
   },
   {
     name: 'Ivoclar Vivadent',
-    logo: 'https://via.placeholder.com/200x100/00A3E0/FFFFFF?text=Ivoclar',
+    logo: '/logos/ivoclar.png',
     description: 'Innovative dental products and materials',
     featured: true
   },
   {
     name: 'Kerr Dental',
-    logo: 'https://via.placeholder.com/200x100/FF6B35/FFFFFF?text=Kerr',
+    logo: '/logos/kerr.png',
     description: 'Quality dental supplies and materials',
     featured: false
   },
   {
     name: 'GC Corporation',
-    logo: 'https://via.placeholder.com/200x100/00B140/FFFFFF?text=GC',
+    logo: '/logos/gc.png',
     description: 'Japanese dental excellence and innovation',
     featured: false
   },
   {
     name: 'Ultradent',
-    logo: 'https://via.placeholder.com/200x100/0052A5/FFFFFF?text=Ultradent',
+    logo: '/logos/ultradent.png',
     description: 'Advanced dental materials and equipment',
     featured: false
   },
   {
     name: 'Shofu Dental',
-    logo: 'https://via.placeholder.com/200x100/E30613/FFFFFF?text=Shofu',
+    logo: '/logos/shofu.png',
     description: 'Premium dental products from Japan',
     featured: false
   },
   {
     name: 'Septodont',
-    logo: 'https://via.placeholder.com/200x100/009FE3/FFFFFF?text=Septodont',
+    logo: '/logos/septodont.png',
     description: 'Anesthesia and pharmaceutical specialists',
     featured: false
   },
   {
     name: 'Bisco Dental',
-    logo: 'https://via.placeholder.com/200x100/ED1C24/FFFFFF?text=Bisco',
+    logo: '/logos/bisco.png',
     description: 'Bonding and restorative materials',
     featured: false
   },
   {
     name: 'Coltene',
-    logo: 'https://via.placeholder.com/200x100/0066B3/FFFFFF?text=Coltene',
+    logo: '/logos/coltene.png',
     description: 'Swiss dental quality and precision',
     featured: false
   },
   {
     name: 'Angelus',
-    logo: 'https://via.placeholder.com/200x100/00A859/FFFFFF?text=Angelus',
+    logo: '/logos/angelus.png',
     description: 'Endodontic solutions and materials',
     featured: false
   },
   {
     name: 'Miltex',
-    logo: 'https://via.placeholder.com/200x100/003DA5/FFFFFF?text=Miltex',
+    logo: '/logos/miltex.png',
     description: 'Surgical instruments and tools',
     featured: false
   },
   {
     name: 'Woodpecker',
-    logo: 'https://via.placeholder.com/200x100/FF8C00/FFFFFF?text=Woodpecker',
+    logo: '/logos/woodpecker.png',
     description: 'Dental equipment and ultrasonic scalers',
     featured: true
   },
   {
     name: 'NSK',
-    logo: 'https://via.placeholder.com/200x100/E60012/FFFFFF?text=NSK',
+    logo: '/logos/nsk.png',
     description: 'High-speed handpieces and equipment',
     featured: false
   },
   {
     name: 'Hu-Friedy',
-    logo: 'https://via.placeholder.com/200x100/00539F/FFFFFF?text=Hu-Friedy',
+    logo: '/logos/hu-friedy.png',
     description: 'Premium dental instruments',
     featured: false
   },
   {
     name: 'Straumann',
-    logo: 'https://via.placeholder.com/200x100/E30613/FFFFFF?text=Straumann',
+    logo: '/logos/straumann.png',
     description: 'Dental implant systems and solutions',
     featured: true
   },
   {
     name: 'Nobel Biocare',
-    logo: 'https://via.placeholder.com/200x100/0066B3/FFFFFF?text=Nobel',
+    logo: '/logos/nobel.png',
     description: 'Implant dentistry innovations',
     featured: false
   },
   {
     name: 'Zimmer Biomet',
-    logo: 'https://via.placeholder.com/200x100/6D2077/FFFFFF?text=Zimmer',
+    logo: '/logos/zimmer.png',
     description: 'Dental implants and regenerative solutions',
     featured: false
   },
   {
     name: 'Colgate Professional',
-    logo: 'https://via.placeholder.com/200x100/DC143C/FFFFFF?text=Colgate',
+    logo: '/logos/colgate.png',
     description: 'Professional oral care products',
     featured: false
   },
   {
     name: 'Oral-B Professional',
-    logo: 'https://via.placeholder.com/200x100/0066CC/FFFFFF?text=Oral-B',
+    logo: '/logos/oral-b.png',
     description: 'Professional dental hygiene products',
     featured: false
   }

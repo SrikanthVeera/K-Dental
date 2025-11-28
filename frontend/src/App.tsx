@@ -1,7 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 import Home from "./pages/home";
 import HomePage from "./pages/HomePage";
+import { migrateCartStorage } from "./utils/migrateCart";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ProductDetail from "./pages/ProductDetail";
@@ -47,6 +49,11 @@ import Users from "./pages/admin/Users";
 import Settings from "./pages/admin/Settings";
 
 export default function App() {
+  // ✅ Migrate cart storage format on app startup
+  useEffect(() => {
+    migrateCartStorage();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Toaster
