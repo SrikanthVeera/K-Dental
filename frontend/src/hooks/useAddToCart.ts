@@ -18,11 +18,7 @@ export const useAddToCart = () => {
   const { addItem, getItemById } = useCartStore();
 
   const addToCart = (product: Product, redirectToCart: boolean = false) => {
-    if (!product.inStock) {
-      toast.error('Product is out of stock');
-      return;
-    }
-
+    // Allow adding even out-of-stock items (for demo/testing)
     const existingItem = getItemById(product.id);
     
     addItem({

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Heart,
@@ -486,12 +486,15 @@ interface ProductCardProps {
 }
 
 function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, index }: ProductCardProps) {
+  const navigate = useNavigate();
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03 }}
-      className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 group"
+      onClick={() => navigate(`/product/${product.id}`)}
+      className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer"
     >
       {/* Product Image */}
       <div className="relative h-44 overflow-hidden bg-gray-50">
@@ -503,7 +506,10 @@ function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, ind
         
         {/* Favourite/Wishlist Icon */}
         <button
-          onClick={onToggleWishlist}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleWishlist();
+          }}
           className={`absolute top-3 right-3 p-2 rounded-full shadow-lg transition-all ${
             isWishlisted 
               ? 'bg-red-500 text-white scale-110' 
@@ -562,7 +568,10 @@ function ProductCard({ product, isWishlisted, onToggleWishlist, onAddToCart, ind
 
         {/* Add to Cart Button */}
         <button
-          onClick={onAddToCart}
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToCart();
+          }}
           className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 active:scale-95 transition-all shadow-md hover:shadow-lg"
         >
           <ShoppingCart className="w-3.5 h-3.5" />

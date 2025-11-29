@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, SlidersHorizontal, Heart, ShoppingCart, Star, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
@@ -476,14 +477,17 @@ export default function ShopPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredProducts.map((product) => (
+                {filteredProducts.map((product) => {
+                  const navigate = useNavigate();
+                  return (
                   <motion.div
                     key={product.id}
                     layout
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                    onClick={() => navigate(`/product/${product.id}`)}
+                    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group cursor-pointer"
                   >
                     {/* Product Image */}
                     <div className="relative h-48 overflow-hidden bg-gray-50">
@@ -498,7 +502,10 @@ export default function ShopPage() {
                         </div>
                       )}
                       <button
-                        onClick={() => toggleWishlist(product.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(product.id);
+                        }}
                         className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md hover:scale-110 transition-transform"
                       >
                         <Heart
@@ -546,6 +553,7 @@ export default function ShopPage() {
 
                       {/* Add to Cart Button */}
                       <button
+                        onClick={(e) => e.stopPropagation()}
                         disabled={!product.inStock}
                         className={`w-full py-2 px-4 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all ${
                           product.inStock
@@ -556,13 +564,10 @@ export default function ShopPage() {
                         <ShoppingCart className="h-4 w-4" />
                         {product.inStock ? 'Add to Cart' : 'Out of Stock'}
                       </button>
-
-                      <button className="w-full mt-2 text-xs text-green-600 hover:underline">
-                        View Similar Products →
-                      </button>
                     </div>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

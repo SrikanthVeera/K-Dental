@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Star, Heart, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAddToCart } from '../hooks/useAddToCart';
@@ -19,6 +20,7 @@ interface Product {
 }
 
 export default function ProductGrid() {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -163,7 +165,8 @@ export default function ProductGrid() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="group relative bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden"
+              onClick={() => navigate(`/product/${product.id}`)}
+              className="group relative bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer"
             >
               {/* Discount Badge */}
               {product.discount && product.discount > 0 && (
@@ -174,7 +177,10 @@ export default function ProductGrid() {
 
               {/* Wishlist Button */}
               <button
-                onClick={() => toggleWishlist(product.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWishlist(product.id);
+                }}
                 className="absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow-md hover:scale-110 transition-transform duration-200"
               >
                 <Heart
@@ -212,7 +218,7 @@ export default function ProductGrid() {
                 </p>
 
                 {/* Product Name */}
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem]">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3.5rem] hover:text-blue-600 transition-colors">
                   {product.name}
                 </h3>
 
@@ -245,7 +251,10 @@ export default function ProductGrid() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => handleAddToCart(product)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAddToCart(product);
+                  }}
                   disabled={!product.inStock}
                   className={`w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-200 ${
                     product.inStock
