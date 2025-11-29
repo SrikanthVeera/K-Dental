@@ -705,7 +705,7 @@ const FeaturedProducts = () => {
           {products.slice(0, 12).map((product: any, index: number) => (
             <Link
               key={product.id}
-              to="/best-seller"
+              to={`/product/${product.id}`}
             >
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

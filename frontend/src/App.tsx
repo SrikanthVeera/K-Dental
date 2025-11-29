@@ -24,6 +24,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import CartDemoPage from "./pages/CartDemoPage";
 import ApiTestPage from "./pages/ApiTestPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
 // New Auth imports
 import LoginPage from "./pages/LoginPage";
@@ -97,13 +98,7 @@ export default function App() {
           </>
         } />
         <Route path="/category/:category" element={<CategoryPage />} />
-        <Route path="/product/:slug" element={
-          <>
-            <Header />
-            <ProductDetail />
-            <Footer />
-          </>
-        } />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/buying-guide" element={
           <>
             <Header />
